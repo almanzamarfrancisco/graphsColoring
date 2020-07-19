@@ -1,0 +1,54 @@
+@font-face {
+	font-family: "SairaCondensed";
+	src: url("../fonts/SairaCondensed-Light.ttf");
+}
+body{
+	font-family: SairaCondensed;
+	padding: 3% 10%;
+}
+h1, h2, h3, h4, h5, h6{
+	padding: 0;
+	margin: 0;
+}
+#Inner{
+	text-align: center;
+}
+.node{
+	fill: #8f1f96de;
+	stroke: #0000008c;
+	stroke-width: 3px;
+}
+.link{
+	fill: #777;
+	stroke: #000;
+	stroke-width: 3px;
+}
+.alert{
+	background-color: #62ff0038;
+	border-radius: 8px;
+	border: 2px #62ff00 solid;background-color: #62ff0038; 
+}
+.hidden{
+	display: none
+}
+.box-show-color{
+	display: inline-block;width: 10px;height: 10px;margin: 0 10%;
+}
+pre{
+	background: #f4f4f4;
+	border: 1px solid #ddd;
+	border-left: 3px solid #8d3e92;
+	color: #666;
+	font-family: monospace;
+	font-size: 15px;
+	line-height: 1.6;
+	margin-bottom: 1.6em;
+	/*max-width: 100%;*/
+	/*overflow: auto;*/
+	padding: 1em 1.5em;
+	display: block;
+	text-align: left;
+}
+.white{
+	color: #fff;
+}
