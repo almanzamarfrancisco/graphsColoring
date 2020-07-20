@@ -18,7 +18,15 @@
 	var neighborhoodLengths = [] // For neighborhood node lengths
 	// Makes an array of consecutive numbers on a range
 	// const arrayRange = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
-	var nodeRadius = screen.width*0.02 //
+	var nodeRadius 
+	if(screen.width <= 768)
+		nodeRadius = screen.width*0.06
+	else
+		nodeRadius = screen.width*0.02
+	if(screen.width <= 425)
+		nodeRadius = screen.width*0.09
+
+	console.log(nodeRadius, screen.width)
 	var counter = -1
 
 	main() // main function execution
@@ -41,7 +49,7 @@
 			default:
 				graph = firstGraph
 				localStorage.setItem('graph', 'firstGraph')
-				local.reload()
+				localtion.reload()
 				break;
 		}
 		globalData.nodes = graph.nodes.map(node => {
