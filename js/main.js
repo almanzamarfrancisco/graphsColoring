@@ -24,9 +24,26 @@
 	main() // main function execution
 
 	function main() {
-		// let graph = firstGraph
-		let graph = secondGraph
-		// let graph = thirdGraph
+		let graph
+		switch (localStorage.getItem('graph')) {
+			case 'firstGraph':
+				graph = firstGraph
+				document.getElementsByName('selection')[0].checked = true
+				break;
+			case 'secondGraph':
+				graph = secondGraph
+				document.getElementsByName('selection')[1].checked = true
+				break;
+			case 'thirdGraph':
+				graph = thirdGraph
+				document.getElementsByName('selection')[2].checked = true
+				break;
+			default:
+				graph = firstGraph
+				localStorage.setItem('graph', 'firstGraph')
+				local.reload()
+				break;
+		}
 		globalData.nodes = graph.nodes.map(node => {
 			node.r = nodeRadius
 			return node
@@ -38,6 +55,11 @@
 		getAllNodesNeighborhood() // Fill neighborhood
 		console.log(neighborhoodLengths)
 		colorGraph(neighborhoodLengths.indexOf(Math.max(...neighborhoodLengths)), [...neighborhoodLengths])
+		for(let o of document.getElementsByName('selection'))
+			o.addEventListener('change', function(){
+				localStorage.setItem('graph', o.value)
+				location.reload()
+		})
 		// let t = arrayRange(1, 7,1)
 		// console.log(t.map(value => {return { "index": value, "label": "node" + value }}))
 	}
@@ -263,7 +285,7 @@
 			return
 		fillNode(globalData.nodes[nodeIndex].label, nodesColors[++counter])
 		if(counter >= nodesColors.length-1)
-			counter = -1
+			counter = 0
 		x[nodeIndex] = -1
 		console.log(x)
 		console.log(x.indexOf(Math.max(...x)), [...x], counter)
