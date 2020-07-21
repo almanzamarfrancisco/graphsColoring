@@ -16,6 +16,9 @@
 	var globalData = {} // Data json object
 	var foundCliques = [] // Max cliques array
 	var neighborhoodLengths = [] // For neighborhood node lengths
+
+	const maxAllowedSize = 5 * 1024 * 1024 // Max allowed size of file
+
 	// Makes an array of consecutive numbers on a range
 	// const arrayRange = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 	var nodeRadius 
@@ -26,32 +29,40 @@
 	if(screen.width <= 425)
 		nodeRadius = screen.width*0.09
 
-	console.log(nodeRadius, screen.width)
+	// console.log(nodeRadius, screen.width)
 	var counter = -1
 
 	main() // main function execution
 
 	function main() {
 		let graph
-		switch (localStorage.getItem('graph')) {
-			case 'firstGraph':
-				graph = firstGraph
-				document.getElementsByName('selection')[0].checked = true
-				break;
-			case 'secondGraph':
-				graph = secondGraph
-				document.getElementsByName('selection')[1].checked = true
-				break;
-			case 'thirdGraph':
-				graph = thirdGraph
-				document.getElementsByName('selection')[2].checked = true
-				break;
-			default:
-				graph = firstGraph
-				localStorage.setItem('graph', 'firstGraph')
-				localtion.reload()
-				break;
+		let loadedGraph
+		if(loadedGraph = localStorage.getItem('loadedGraph')){
+			document.getElementById('setDefaults').classList.remove('hidden')
+			// console.log(JSON.parse(loadedGraph))
+			graph = JSON.parse(loadedGraph)
 		}
+		else
+			switch (localStorage.getItem('graph')) {
+				case 'firstGraph':
+					graph = firstGraph
+					document.getElementsByName('selection')[0].checked = true
+					break;
+				case 'secondGraph':
+					graph = secondGraph
+					document.getElementsByName('selection')[1].checked = true
+					break;
+				case 'thirdGraph':
+					graph = thirdGraph
+					document.getElementsByName('selection')[2].checked = true
+					break;
+				default:
+					graph = firstGraph
+					localStorage.setItem('graph', 'firstGraph')
+					location.reload()
+					break;
+			}
+		console.log(globalData)
 		globalData.nodes = graph.nodes.map(node => {
 			node.r = nodeRadius
 			return node
@@ -68,6 +79,8 @@
 				localStorage.setItem('graph', o.value)
 				location.reload()
 		})
+		document.querySelector("#loadFile").// Load file button
+			addEventListener('change', function(){ getFileContent() }, false)
 		// let t = arrayRange(1, 7,1)
 		// console.log(t.map(value => {return { "index": value, "label": "node" + value }}))
 	}
@@ -225,11 +238,11 @@
 	// For filling a node
 	function fillNode(nodeLabel, color){// Fill neighborhood 
 		let v = d3.select('#' + nodeLabel)
-		console.log('Fill visited: ' + v.attr('visited'), color)
+		// console.log('Fill visited: ' + v.attr('visited'), color)
 		if(v.attr('visited')){
 			v.attr('fill', color)
 			v.attr('visited', true)
-			console.log('filled')
+			// console.log('filled')
 		}
 	}
 	// For showing the node label
@@ -296,9 +309,81 @@
 		if(counter >= nodesColors.length-1)
 			counter = 0
 		x[nodeIndex] = -1
-		console.log(x)
-		console.log(x.indexOf(Math.max(...x)), [...x], counter)
+		console.log(x.indexOf(Math.max(...x)), [...x])
 		colorGraph(x.indexOf(Math.max(...x)), [...x])
+	}
+	function getFileContent(){
+		var file = document.getElementById('loadFile').files[0];
+		if (file) {
+			// console.log(file)
+			if(file.type !== "application/json" && file.type !== "text/plain")
+				alert("Only json and csv files are accepted")
+			if(file.size > maxAllowedSize)
+				alert("File is too big for processing")
+			let reader = new FileReader();
+			reader.readAsText(file, "UTF-8");
+			reader.onload = function (event) {
+				// document.getElementById("fileContents").innerHTML = event.target.result
+				if(file.type == "application/json"){
+					// console.log(JSON.parse(event.target.result))
+					let json = JSON.parse(event.target.result)
+					let graph = {}
+					graph.links = []
+					let nodes = []
+					json.links.map(link => {
+						if(!nodes.includes(link.source))
+							nodes.push(link.source)
+						if(!nodes.includes(link.target))
+							nodes.push(link.target)
+						graph.links.push(link)
+					})
+					graph.nodes = nodes.map((item) => {
+						return {
+							index: item,
+							label: 'node' + item,
+						}
+					})
+					// console.log(graph)
+					localStorage.setItem('loadedGraph', JSON.stringify(graph))
+				}
+				if(file.type == "text/plain"){
+					// console.log(event.target.result)
+					let links = event.target.result.split('\n')
+					let graph = {}
+					graph.links = []
+					let nodes = []
+					links.map(link => {
+						let l = link.split(' ')
+						if(!nodes.includes(l[0]))
+							nodes.push(l[0])
+						if(!nodes.includes(l[1]))
+							nodes.push(l[1])
+						graph.links.push({
+							source: l[0],
+							target: l[1],
+						})
+					})
+					graph.nodes = nodes.map((item) => {
+						return {
+							index: item,
+							label: 'node' + item,
+						}
+					})
+					console.log(graph)
+					localStorage.setItem('loadedGraph', JSON.stringify(graph))
+				}
+				document.getElementById('drawLoadedGraph').classList.remove('hidden')
+				document.getElementById('successAlert').classList.remove('hidden')
+				
+			}
+			reader.onerror = function (event) {
+				// document.getElementById("fileContents").innerHTML = "error reading file"
+				console.info("error reading to load file")
+				alert("There was an error to load file")
+			}
+		}
+		else
+			alert("There was an error on the file")
 	}
 
 }());

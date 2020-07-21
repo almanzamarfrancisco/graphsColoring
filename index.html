@@ -31,6 +31,15 @@
 			<label for="second">Second example Graph</label><br>
 			<input type="radio" id="third" name="selection" value="thirdGraph">
 			<label for="third">Third example Graph</label>
+			<br>
+			<h3>or load graph from file:</h3>
+			<input type="file" id="loadFile" name="loadFile" accept=".json, .txt"> <br>
+			<small style="font-weight: bold;">Permited formats are json and txt</small>
+			<br>
+			<p class="alert hidden" id="successAlert">File loaded succesfully, now click on next button for visualice</p>
+			<button id="drawLoadedGraph" class="hidden" onclick="location.reload()" style="font-size: 1.1em">Draw Loaded Graph</button>
+			<button id="setDefaults" class="hidden" onclick="setDefault()" type="button">Skip loaded Graph</button>
+
 		</div>
 		<div id="graph"></div>    
 	</div>
