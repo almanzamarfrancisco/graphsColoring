@@ -236,13 +236,25 @@
 			})
 	}
 	// For filling a node
-	function fillNode(nodeLabel, color){// Fill neighborhood 
-		let v = d3.select('#' + nodeLabel)
+	function fillNode(nodeIndex, color){// Fill neighborhood 
+		let v = d3.select('#' + globalData.nodes[nodeIndex].label)
+		let ne = getNeighbors(nodeIndex)
+		let b = false
+		for(let c of ne)
+			if(c.color == color){
+				b = true
+				break;
+			}
 		// console.log('Fill visited: ' + v.attr('visited'), color)
-		if(v.attr('visited')){
+		if(!b){
 			v.attr('fill', color)
 			v.attr('visited', true)
-			// console.log('filled')
+			globalData.nodes[nodeIndex].color = color
+		}
+		else{
+			v.attr('fill', nodesColors[counter + 1])
+			v.attr('visited', true)
+			globalData.nodes[nodeIndex].color = nodesColors[counter + 1]
 		}
 	}
 	// For showing the node label
@@ -261,8 +273,9 @@
 	}
 	// For getting Neighbors
 	function getNeighbors(index){
-		return globalData.nodes[index].neighbors.map(function(nodeLabel){
-			return globalData.nodes[parseInt(nodeLabel.replace('node', ''))]
+		let neighborsLabels = globalData.nodes[index].neighbors
+		return globalData.nodes.filter(node => {
+			return neighborsLabels.includes(node.label)
 		})
 	}
 	// For getting subsets intersection
@@ -293,7 +306,6 @@
 		R.map(function(node){
 			d3.select('#node' + node.index)
 			.attr('fill', color)
-			.attr('clique-part',true)
 		})
 	}
 	// For delete a node from a graph
@@ -305,7 +317,7 @@
 	function colorGraph(nodeIndex, x){
 		if(x == null || !globalData.nodes[nodeIndex] || x[nodeIndex] == -1)
 			return
-		fillNode(globalData.nodes[nodeIndex].label, nodesColors[++counter])
+		fillNode(nodeIndex, nodesColors[++counter])
 		if(counter >= nodesColors.length-1)
 			counter = 0
 		x[nodeIndex] = -1
@@ -337,6 +349,7 @@
 							nodes.push(link.target)
 						graph.links.push(link)
 					})
+					nodes.sort()
 					graph.nodes = nodes.map((item) => {
 						return {
 							index: item,
